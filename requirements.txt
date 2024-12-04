@@ -1,5 +1,7 @@
 atproto
 datetime
 openai
+python-dateutil
+pytz
 requests
 rss_parser
