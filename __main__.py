@@ -14,7 +14,10 @@ FEEDS=["https://rss.politico.com/politics-news.xml",
        "https://moxie.foxnews.com/google-publisher/politics.xml",
        "https://slate.com/feeds/news-and-politics.rss", 
        "https://www.ansa.it/sito/notizie/mondo/mondo_rss.xml",
-       "https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml"
+       "https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml",
+       "https://www.thenation.com/subject/politics/feed/",
+       "https://feeds.npr.org/1014/rss.xml",
+       "https://www.realclearpolitics.com/index.xml"
     ]
 KEYWORD="pizza"
 
@@ -27,7 +30,7 @@ def main():
     bsclient.login(BSUSER, BSPW)
 
     # twenty minutes ago
-    twenty_minutes_ago = datetime.now() - timedelta(minutes=20)
+    twenty_minutes_ago = datetime.now(pytz.timezone("UTC")) - timedelta(minutes=20)
 
     # Go through the RSS feeds one at a time
     for RSS_URL in FEEDS:
@@ -44,13 +47,10 @@ def main():
             link = ""
 
             # Some pubDates use the timezone and some the offset.  Account for both
-            try:
-                pub_date = datetime.strptime(item.pub_date.content, "%a, %d %b %Y %H:%M:%S %Z")
-            except ValueError:
-                pub_date = datetime.strptime(item.pub_date.content, "%a, %d %b %Y %H:%M:%S %z")
-            
+            pub_date = parser.parse(item.pub_date.content)
+
             # check if the post was from more than 20 minutes ago
-            if pub_date.isoformat() > twenty_minutes_ago.isoformat():
+            if pub_date > twenty_minutes_ago:
                 
                 # make sure the title and description are not null
                 if item.title is not None:
