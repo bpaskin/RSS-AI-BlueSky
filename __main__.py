@@ -34,8 +34,12 @@ def main():
 
     # Go through the RSS feeds one at a time
     for RSS_URL in FEEDS:
-        response = get(RSS_URL)
-        rss = RSSParser.parse(response.text)
+        try:
+            response = get(RSS_URL)
+            rss = RSSParser.parse(response.text)
+        except:
+            print("Error processing feed from : " + RSS_URL)
+            continue
 
         # loop through rss feed
         for item in rss.channel.items:
@@ -68,8 +72,7 @@ def main():
                     completion = oaclient.chat.completions.create(
                         model="gpt-4o",
                         messages=[
-                            {"role": "user", "content": "create a black metal song title based on the following passage:" + combined_string}
-                        ]
+                            {"role": "user", "content": "create a black metal or death metal song title based on the following passage: " + combined_string}                        ]
                     )
                     
                     # post the results to Blue Sky
