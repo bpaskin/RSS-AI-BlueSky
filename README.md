@@ -7,5 +7,4 @@ This is a bot that is invoked from a scheduler every 20 minutes and then reads a
 - The `variables` section in the code needs to be updated with the proper OpenAI key, Blue Sky username and password, and search term.
 - Why every 20 miniutes?  Blue Sky has [rate limits](https://docs.bsky.app/blog/rate-limits-pds-v3) and to prevent from hitting the rate limit in a day it is set for 20 minutes.
 - Can other LLMs be used?  Yes, I originally tried with [Ollama](https://ollama.com), but I could not find a good model to use.  The code is not too difficult to change the call to another LLM via a REST call.
-- Can more than 1 keyword be used? Yes, if the simple substring search is changed to regex it should not be a problem.  I will probably do this in the future.
 - Example: [Black Metal Trump](https://bsky.app/profile/blackmetaltrump.bsky.social) - non political changing to black metal song titles.
