@@ -19,7 +19,7 @@ FEEDS=["https://rss.politico.com/politics-news.xml",
        "https://feeds.npr.org/1014/rss.xml",
        "https://www.realclearpolitics.com/index.xml"
     ]
-KEYWORD="pizza"
+KEYWORDS=["Trump", "McDonald's"]
 
 def main():
     # create an OpenAI client
@@ -68,7 +68,7 @@ def main():
                 link = item.links[0].content
                 
                 # Check if the word we are searching for exists in the title or description, if so call ChatGPT
-                if KEYWORD in combined_string:
+                if any(substring in combined_string for substring in KEYWORDS):
                     completion = oaclient.chat.completions.create(
                         model="gpt-4o",
                         messages=[
@@ -76,8 +76,6 @@ def main():
                     )
                     
                     # post the results to Blue Sky
-                    print(completion.choices[0].message.content + "\r\n" + link)
                     post = bsclient.send_post(completion.choices[0].message.content + "\r\n" + link)
-
 if __name__ == "__main__":
     main()
