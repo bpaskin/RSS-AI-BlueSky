@@ -25,7 +25,7 @@ def main():
     # create an OpenAI client
     oaclient = OpenAI(api_key=OPENAI_API_KEY)
 
-    # create Blue Sky client 
+    # create Blue Sky client
     bsclient = Client()
     bsclient.login(BSUSER, BSPW)
 
@@ -43,7 +43,7 @@ def main():
 
         # loop through rss feed
         for item in rss.channel.items:
-            
+
             # clear out the vars
             title = ""
             description = ""
@@ -55,10 +55,10 @@ def main():
 
             # check if the post was from more than 20 minutes ago
             if pub_date > twenty_minutes_ago:
-                
+
                 # make sure the title and description are not null
                 if item.title is not None:
-                    title = item.title.content + "." 
+                    title = item.title.content + "."
 
                 if item.description is not None:
                     description = item.description.content
@@ -66,16 +66,26 @@ def main():
                 combined_string = title + description
 
                 link = item.links[0].content
-                
+
                 # Check if the word we are searching for exists in the title or description, if so call ChatGPT
                 if any(substring in combined_string for substring in KEYWORDS):
                     completion = oaclient.chat.completions.create(
                         model="gpt-4o",
                         messages=[
-                            {"role": "user", "content": "create a black metal or death metal song title based on the following passage: " + combined_string}                        ]
+                            {"role": "user", "content": "create a black metal or death metal song title based on the following  passage: " + combined_string}
+                        ]
                     )
-                    
+
                     # post the results to Blue Sky
-                    post = bsclient.send_post(completion.choices[0].message.content + "\r\n" + link)
+                    try:
+                       
+                       # limit for BS is 300 graphemes.  Make sure it is under that amount
+                       if (grapheme.length(completion.choices[0].message.content) < 300): 
+                            post = bsclient.send_post(completion.choices[0].message.content + "\r\n" + link)
+                       else: 
+                            print (completion.choices[0].message.content + " is longer than 300 graphemes")
+                    except Exception as error:
+                       print("Error posting to Blue Sky: " + str(error))
+
 if __name__ == "__main__":
     main()
