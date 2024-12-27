@@ -96,7 +96,7 @@ def main():
                     try:
                        
                        # limit for BS is 300 graphemes.  Make sure it is under that amount
-                       if (grapheme.length(completion.choices[0].message.content) + "\r\n" + link < 300): 
+                       if (grapheme.length(completion.choices[0].message.content + "\r\n" + link) < 300): 
                             post = bsclient.send_post(completion.choices[0].message.content + "\r\n" + link)
                        else: 
                             print (completion.choices[0].message.content + " is longer than 300 graphemes")
