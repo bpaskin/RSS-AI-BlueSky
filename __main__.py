@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 from openai import OpenAI
 from requests import get  
 from rss_parser import RSSParser
+import grapheme
+import random
 
 # variables 
 OPENAI_API_KEY="OpenAIKey"
@@ -20,6 +22,17 @@ FEEDS=["https://rss.politico.com/politics-news.xml",
        "https://www.realclearpolitics.com/index.xml"
     ]
 KEYWORDS=["Trump", "McDonald's"]
+PROMPTS=["create a black metal or death metal song title based on the following passage:",
+        "create a black metal or death metal song title with Lovecraftian overtones based on the following passage:",
+        "create a black metal or death metal song title in the style of Darkthrone based on the following passage:",
+        "create a black metal or death metal song title in the style of Marduk based on the following passage:",
+        "create a black metal or death metal song title in the style of Immortal based on the following passage:",
+        "create a black metal or death metal song title in the style of Mayhem based on the following passage:",
+        "create a black metal or death metal song title with wintery overtones based on the following passage:",
+        "create a black metal or death metal song title with war overtones based on the following passage:",
+        "create a black metal or death metal song title with Satanic overtones based on the following passage:",
+        "create a black metal or death metal song title with Satanic and war overtones based on the following passage:"
+    ]
 
 def main():
     # create an OpenAI client
@@ -67,12 +80,15 @@ def main():
 
                 link = item.links[0].content
 
+                # choose which prompt to use
+                choice = random.randint(0, len(PROMPTS) - 1)
+
                 # Check if the word we are searching for exists in the title or description, if so call ChatGPT
                 if any(substring in combined_string for substring in KEYWORDS):
                     completion = oaclient.chat.completions.create(
                         model="gpt-4o",
                         messages=[
-                            {"role": "user", "content": "create a black metal or death metal song title based on the following  passage: " + combined_string}
+                            {"role": "user", "content": PROMPTS[choice] + combined_string}
                         ]
                     )
 
@@ -80,7 +96,7 @@ def main():
                     try:
                        
                        # limit for BS is 300 graphemes.  Make sure it is under that amount
-                       if (grapheme.length(completion.choices[0].message.content) < 300): 
+                       if (grapheme.length(completion.choices[0].message.content) + "\r\n" + link < 300): 
                             post = bsclient.send_post(completion.choices[0].message.content + "\r\n" + link)
                        else: 
                             print (completion.choices[0].message.content + " is longer than 300 graphemes")
