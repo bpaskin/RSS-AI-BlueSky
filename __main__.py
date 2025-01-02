@@ -92,14 +92,21 @@ def main():
                         ]
                     )
 
+                    # extract message between the quotes using regex
+                    match = re.search(r'"[^"]*"', completion.choices[0].message.content)
+                    if match:
+                        title = match.group()
+                    else:
+                        title = completion.choices[0].message.content
+
+
                     # post the results to Blue Sky
                     try:
-                       
                        # limit for BS is 300 graphemes.  Make sure it is under that amount
-                       if (grapheme.length(completion.choices[0].message.content + "\r\n" + link) < 300): 
-                            post = bsclient.send_post(completion.choices[0].message.content + "\r\n" + link)
+                       if (grapheme.length(title + "\r\n" + link) < 300): 
+                            post = bsclient.send_post(title + "\r\n" + link)
                        else: 
-                            print (completion.choices[0].message.content + " is longer than 300 graphemes")
+                            print (title + "\r\n" + link + " is longer than 300 graphemes")
                     except Exception as error:
                        print("Error posting to Blue Sky: " + str(error))
 
